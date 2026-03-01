@@ -1,12 +1,14 @@
-from cv1 import fibonacci_search, golden_section_search, quadratic_fit_search
+
+from utils import plot_contours_with_traj
 
 import numpy as np
 from matplotlib import pyplot as plt
 
 
-def gradient_descent(f_input: callable, grad: callable, x0: list, n: int = 100, threshold = 1e-2, bracketing_method: callable = fibonacci_search):
+def gradient_descent(f_input: callable, grad: callable, x0: list, n: int = 100, threshold = 1e-2):
     x = np.array(x0, dtype=np.float64)
     x_traj = np.zeros([n, 3])
+    stepsize_decay = lambda k: 0.9**(k+28)
     
     count = 0
     
@@ -19,35 +21,13 @@ def gradient_descent(f_input: callable, grad: callable, x0: list, n: int = 100, 
         
         if grad_norm <= threshold: 
             break
-        
-        stepsize_interval = find_stepsize_interval(f_input, grad_vec, x)
-        phi = lambda stepsize: f_input(x[0] - stepsize * grad_vec[0], x[1] - stepsize * grad_vec[1])
-        a, b = bracketing_method(stepsize_interval, phi, 50)
-        
-        stepsize = (a + b) / 2
+
+        stepsize = stepsize_decay(count)
         x -= stepsize * grad_vec
         
         count += 1
 
     return x, x_traj[:count+1]
-
-def find_stepsize_interval(f_input: callable, grad_vec: np.array, x0: np.array):
-    a1 = 0.0
-    a2 = 1.0
-
-    x_new_a1 = x0 - a1 * grad_vec
-    f1 = f_input(x_new_a1[0], x_new_a1[1])
-
-    x_new_a2 = x0 - a2 * grad_vec
-    f2 = f_input(x_new_a2[0], x_new_a2[1])
-
-    while f2 < f1:
-        a1, f1 = a2, f2
-        a2 *= 2
-        x_new_a2 = x0 - a2 * grad_vec
-        f2 = f_input(x_new_a2[0], x_new_a2[1])
-
-    return [a1, a2]
 
 def main():
     a, b = 1, 5
