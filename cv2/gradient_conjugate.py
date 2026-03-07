@@ -1,5 +1,5 @@
 from cv1 import fibonacci_search, golden_section_search, quadratic_fit_search
-from .utils import vizualize_func_levels
+from ..utils.vizialize import vizualize_func_levels
 
 import numpy as np
 from matplotlib import pyplot as plt
